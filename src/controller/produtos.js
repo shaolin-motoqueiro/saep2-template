@@ -39,114 +39,114 @@ app.post('/add_produto', async (req, res) => {
   }
 });
 
-// router.get('/listar_produtos', async (req, res) => {
-//   try {
-//     const { rows: produtos } = await conexao.query(
-//       'SELECT id_produto, nome, descricao, valor_unitario, quantidade, data_cadastro FROM produto'
-//     );
+app.get('/listar_produtos', async (req, res) => {
+  try {
+    const { rows: produtos } = await conexao.query(
+      'SELECT id_produto, nome, descricao, valor_unitario, quantidade, data_cadastro FROM produto'
+    );
 
-//     return res.status(200).json(produtos);
-//   } catch (erro) {
-//     console.log(erro);
-//     return res.status(500).json({ erro: 'Erro ao listar produtos' });
-//   }
-// });
+    return res.status(200).json(produtos);
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).json({ erro: 'Erro ao listar produtos' });
+  }
+});
 
-// router.get('/listar_produto/:id', async (req, res) => {
-//   const { id } = req.params;
+app.get('/listar_produto/:id', async (req, res) => {
+  const { id } = req.params;
 
-//   if (isNaN(Number(id))) {
-//     return res.status(422).json({ erro: 'O id informado e invalido' });
-//   }
+  if (isNaN(Number(id))) {
+    return res.status(422).json({ erro: 'O id informado e invalido' });
+  }
 
-//   try {
-//     const { rows: produtos } = await conexao.query(
-//       'SELECT id_produto, nome, descricao, valor_unitario, quantidade, data_cadastro FROM produto WHERE id_produto = $1',
-//       [Number(id)]
-//     );
+  try {
+    const { rows: produtos } = await conexao.query(
+      'SELECT id_produto, nome, descricao, valor_unitario, quantidade, data_cadastro FROM produto WHERE id_produto = $1',
+      [Number(id)]
+    );
 
-//     if (produtos.length === 0) {
-//       return res.status(404).json({ erro: 'Produto nao encontrado' });
-//     }
+    if (produtos.length === 0) {
+      return res.status(404).json({ erro: 'Produto nao encontrado' });
+    }
 
-//     return res.status(200).json(produtos[0]);
-//   } catch (erro) {
-//     console.log(erro);
-//     return res.status(500).json({ erro: 'Erro ao consultar produto' });
-//   }
-// });
+    return res.status(200).json(produtos[0]);
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).json({ erro: 'Erro ao consultar produto' });
+  }
+});
 
-// router.put('/atualizar_produto/:id', async (req, res) => {
-//   const { id } = req.params;
-//   const { nome, descricao, valor, quantidade } = req.body;
+app.put('/atualizar_produto/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nome, descricao, valor, quantidade } = req.body;
 
-//   if (isNaN(Number(id))) {
-//     return res.status(422).json({ erro: 'O id informado e invalido' });
-//   }
-//   if (!nome || nome.trim() === '') {
-//     return res.status(422).json({ erro: 'O campo nome e obrigatorio' });
-//   }
-//   if (valor === undefined || valor === null || isNaN(Number(valor)) || Number(valor) < 0) {
-//     return res.status(422).json({ erro: 'O campo valor deve ser um numero maior ou igual a zero' });
-//   }
-//   if (quantidade === undefined || quantidade === null || isNaN(Number(quantidade)) || Number(quantidade) < 0) {
-//     return res.status(422).json({ erro: 'O campo quantidade deve ser um numero maior ou igual a zero' });
-//   }
+  if (isNaN(Number(id))) {
+    return res.status(422).json({ erro: 'O id informado e invalido' });
+  }
+  if (!nome || nome.trim() === '') {
+    return res.status(422).json({ erro: 'O campo nome e obrigatorio' });
+  }
+  if (valor === undefined || valor === null || isNaN(Number(valor)) || Number(valor) < 0) {
+    return res.status(422).json({ erro: 'O campo valor deve ser um numero maior ou igual a zero' });
+  }
+  if (quantidade === undefined || quantidade === null || isNaN(Number(quantidade)) || Number(quantidade) < 0) {
+    return res.status(422).json({ erro: 'O campo quantidade deve ser um numero maior ou igual a zero' });
+  }
 
-//   try {
-//     const { rows: produtos } = await conexao.query(
-//       'SELECT id_produto FROM produto WHERE id_produto = $1',
-//       [Number(id)]
-//     );
+  try {
+    const { rows: produtos } = await conexao.query(
+      'SELECT id_produto FROM produto WHERE id_produto = $1',
+      [Number(id)]
+    );
 
-//     if (produtos.length === 0) {
-//       return res.status(404).json({ erro: 'Produto nao encontrado' });
-//     }
+    if (produtos.length === 0) {
+      return res.status(404).json({ erro: 'Produto nao encontrado' });
+    }
 
-//     await conexao.query(
-//       'UPDATE produto SET nome = $1, descricao = $2, valor_unitario = $3, quantidade = $4 WHERE id_produto = $5',
-//       [nome, descricao || null, Number(valor), Number(quantidade), Number(id)]
-//     );
+    await conexao.query(
+      'UPDATE produto SET nome = $1, descricao = $2, valor_unitario = $3, quantidade = $4 WHERE id_produto = $5',
+      [nome, descricao || null, Number(valor), Number(quantidade), Number(id)]
+    );
 
-//     return res.status(200).json({ mensagem: 'Produto atualizado com sucesso' });
-//   } catch (erro) {
-//     console.log(erro);
-//     return res.status(500).json({ erro: 'Erro ao atualizar produto' });
-//   }
-// });
+    return res.status(200).json({ mensagem: 'Produto atualizado com sucesso' });
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).json({ erro: 'Erro ao atualizar produto' });
+  }
+});
 
-// router.delete('/deletar_produto', async (req, res) => {
-//   const { id_produto } = req.body;
+app.delete('/deletar_produto', async (req, res) => {
+  const { id_produto } = req.body;
 
-//   if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
-//     return res.status(422).json({ erro: 'O campo id_produto e obrigatorio' });
-//   }
+  if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
+    return res.status(422).json({ erro: 'O campo id_produto e obrigatorio' });
+  }
 
-//   try {
-//     const { rows: movimentacoes } = await conexao.query(
-//       'SELECT id_movimentacao FROM movimentacao WHERE id_produto = $1',
-//       [Number(id_produto)]
-//     );
+  try {
+    const { rows: movimentacoes } = await conexao.query(
+      'SELECT id_movimentacao FROM movimentacao WHERE id_produto = $1',
+      [Number(id_produto)]
+    );
 
-//     if (movimentacoes.length > 0) {
-//       return res.status(409).json({ erro: 'O produto possui movimentacoes e nao pode ser removido' });
-//     }
+    if (movimentacoes.length > 0) {
+      return res.status(409).json({ erro: 'O produto possui movimentacoes e nao pode ser removido' });
+    }
 
-//     const resultado = await conexao.query(
-//       'DELETE FROM produto WHERE id_produto = $1',
-//       [Number(id_produto)]
-//     );
+    const resultado = await conexao.query(
+      'DELETE FROM produto WHERE id_produto = $1',
+      [Number(id_produto)]
+    );
 
-//     if (resultado.rowCount === 0) {
-//       return res.status(404).json({ erro: 'Produto nao encontrado' });
-//     }
+    if (resultado.rowCount === 0) {
+      return res.status(404).json({ erro: 'Produto nao encontrado' });
+    }
 
-//     return res.status(200).json({ mensagem: 'Produto removido com sucesso' });
-//   } catch (erro) {
-//     console.log(erro);
-//     return res.status(500).json({ erro: 'Erro ao remover produto' });
-//   }
-// });
+    return res.status(200).json({ mensagem: 'Produto removido com sucesso' });
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).json({ erro: 'Erro ao remover produto' });
+  }
+});
 
 app.listen(porta, () => {
   console.log('Servidor rodando na porta ' + porta);
