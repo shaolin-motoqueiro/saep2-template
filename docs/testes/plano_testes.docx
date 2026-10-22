@@ -1,0 +1,14 @@
+Teste 1: cadastra movimentação do tipo saída na rota movimentar_produto
+Resultado esperado: erro ao cadastrar movimentação
+Resultado obtido: erro ao cadastrar movimentação
+Conclusão: rota funciona corretamente
+
+Teste 2: Listar produto por id com a rota listar_produto/:id
+Resultado esperado: produto listado de acordo com o id informado
+Resultado obtido: produto listado de acordo com o id informado
+Conclusão: rota funciona corretamente
+
+Teste 2: Atualizar produto por id com a rota atualizar_produto/:id
+Resultado esperado: produto atualizado de acordo com o id informado
+Resultado obtido: produto atualizado de acordo com o id informado
+Conclusão: rota funciona corretamente
