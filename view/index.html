@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Estoque</title>
+</head>
+<body>
+  <h1>Estoque</h1>
+
+  <h2>Login</h2>
+  <p>
+    Login: <input id="login" value="operador">
+    Senha: <input id="senha" type="password" value="operador123">
+    <button onclick="fazerLogin()">Entrar</button>
+    <button onclick="sair()">Sair</button>
+    <span id="status">Nao logado</span>
+  </p>
+
+  <h2>Produtos</h2>
+  <button onclick="listarProdutos()">Listar produtos</button>
+
+  <h2>Movimentar</h2>
+  <p>
+    ID do produto: <input id="idProduto" type="number">
+    Tipo:
+    <select id="tipo">
+      <option value="ENTRADA">ENTRADA</option>
+      <option value="SAIDA">SAIDA</option>
+    </select>
+    Quantidade: <input id="quantidade" type="number">
+    <button onclick="movimentar()">Registrar</button>
+  </p>
+
+  <h2>Historico</h2>
+  <button onclick="listarMovimentacoes()">Listar movimentacoes</button>
+
+  <h2>Resposta</h2>
+  <pre id="resposta"></pre>
+
+  <script>
+    let token = null;
+
+    async function fazerLogin() {
+      const resposta = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          login: document.getElementById('login').value,
+          senha: document.getElementById('senha').value
+        })
+      });
+      const dados = await resposta.json();
+
+      if (resposta.ok) {
+        token = dados.token;
+        document.getElementById('status').textContent = 'Logado';
+      } else {
+        token = null;
+        document.getElementById('status').textContent = 'Falhou';
+      }
+      mostrar(resposta.status, dados);
+    }
+    
+    function sair() {
+      token = null;
+      document.getElementById('status').textContent = 'Nao logado';
+      document.getElementById('resposta').textContent = 'Voce saiu. Faca login novamsente.';
+    }
+
+    function mostrar(status, dados) {
+      document.getElementById('resposta').textContent = status + '\n' + JSON.stringify(dados, null, 2);
+    }
+
+    async function chamar(metodo, url, corpo) {
+      if (!token) {
+        document.getElementById('resposta').textContent = 'Faca login primeiro.';
+        return;
+      }
+
+      const opcoes = {
+        method: metodo,
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+      };
+      if (corpo) opcoes.body = JSON.stringify(corpo);
+
+      const resposta = await fetch(url, opcoes);
+      const dados = await resposta.json();
+      mostrar(resposta.status, dados);
+    }
+
+    function listarProdutos() {
+      chamar('GET', '/listar_produtos');
+    }
+
+    function listarMovimentacoes() {
+      chamar('GET', '/listar_movimentacoes');
+    }
+
+    function movimentar() {
+      chamar('POST', '/movimentar_produto', {
+        id_produto: Number(document.getElementById('idProduto').value),
+        tipo: document.getElementById('tipo').value,
+        quantidade: Number(document.getElementById('quantidade').value)
+      });
+    }
+  </script>
+</body>
+</html>
