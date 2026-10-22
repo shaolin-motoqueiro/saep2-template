@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrador</title>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <h1>Painel do Administrador</h1>
+  <button onclick="sair()">Sair</button>
+
+  <h2>Cadastrar Produto</h2>
+  <input id="nome" placeholder="Nome">
+  <input id="descricao" placeholder="Descrição">
+  <input id="valor" type="number" min="0" step="0.01" placeholder="Valor">
+  <input id="quantidade" type="number" min="0" step="1" placeholder="Quantidade">
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <h2>Produtos</h2>
+  <button onclick="listar()">Atualizar</button>
+  <div id="produtos"></div>
+
+  <h2>Movimentar Estoque</h2>
+  <input id="idProduto" type="number" min="1" step="1" placeholder="ID do produto">
+  <select id="tipo">
+    <option value="ENTRADA">Entrada</option>
+    <option value="SAIDA">Saída</option>
+  </select>
+  <input id="qtdMov" type="number" min="1" step="1" placeholder="Quantidade">
+  <button onclick="movimentar()">Registrar</button>
+
+  <h2>Histórico</h2>
+  <button onclick="historico()">Atualizar histórico</button>
+  <div id="movimentacoes"></div>
+</body>
+</html>
