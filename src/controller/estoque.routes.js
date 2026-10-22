@@ -1,5 +1,5 @@
 import express from 'express';
-import conexao from '../config/db.js';
+import conexao from '../model/db.js';
 
 const router = express.Router();
 
@@ -149,7 +149,7 @@ router.delete('/deletar_produto', async (req, res) => {
 // MOVIMENTACOES
 // ---------------------------------------------------------------------------
 
-router.post('/movimentar_produto', async (req, res) => {
+router.post('/movimentar_produto_entrada', async (req, res) => {
   const { id_produto, tipo, quantidade } = req.body;
 
   if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
@@ -185,6 +185,49 @@ router.post('/movimentar_produto', async (req, res) => {
     return res.status(201).json({
       mensagem: 'Entrada registrada com sucesso',
       quantidade_atual: produtos[0].quantidade + Number(quantidade)
+    });
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).json({ erro: 'Erro ao movimentar produto' });
+  }
+});
+
+router.post('/movimentar_produto_saida', async (req, res) => {
+  const { id_produto, tipo, quantidade, quantidadeDisponivel } = req.body;
+
+  if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
+    return res.status(422).json({ erro: 'O campo id_produto e obrigatorio' });
+  }
+  if (tipo !== 'SAIDA') {
+    return res.status(422).json({ erro: 'Somente movimentacoes do tipo SAIDA estao implementadas' });
+  }
+  if (quantidade === undefined || quantidade === null || isNaN(Number(quantidade)) || Number(quantidadeDisponivel)) {
+    return res.status(422).json({ erro: 'O campo quantidade deve ser um numero menor do que o estoque disponível' });
+  }
+
+  try {
+    const { rows: produtos } = await conexao.query(
+      'SELECT id_produto, quantidade FROM produto WHERE id_produto = $1',
+      [Number(id_produto)]
+    );
+
+    if (produtos.length === 0) {
+      return res.status(404).json({ erro: 'Produto nao encontrado' });
+    }
+
+    await conexao.query(
+      'INSERT INTO movimentacao (id_produto, tipo, quantidade) VALUES ($1, $2, $3)',
+      [Number(id_produto), tipo, Number(quantidade)]
+    );
+
+    await conexao.query(
+      'UPDATE produto SET quantidade = quantidadeDisponivel - $3 WHERE id_produto = $1',
+      [Number(quantidade), Number(id_produto)]
+    );
+
+    return res.status(201).json({
+      mensagem: 'Saida registrada com sucesso',
+      quantidade_atual: produtos[0].quantidade - Number(quantidadeDisponivel)
     });
   } catch (erro) {
     console.log(erro);
