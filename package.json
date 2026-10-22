@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Projeto base de controle de estoque com Node.js, Express e PostgreSQL.",
   "type": "module",
-  "main": "src/server.js",
+  "main": "controller/src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "nodemon ./controller/src/server.js"
   },
   "keywords": [
     "saep",
@@ -18,8 +18,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "nodemon": "^3.1.14",
     "pg": "^8.16.3"
   }
 }
