@@ -59,15 +59,15 @@ A API sobe em `http://localhost:3000`.
 
 ## Endpoints
 
-| Metodo | Rota                      | Descricao                                   |
-| ------ | ------------------------- | ------------------------------------------- |
-| POST   | `/add_produto`            | Cadastra um produto                         |
-| GET    | `/listar_produtos`        | Lista todos os produtos                     |
-| GET    | `/listar_produto/:id`     | Consulta um produto pelo id                 |
-| PUT    | `/atualizar_produto/:id`  | Atualiza um produto                         |
-| DELETE | `/deletar_produto`        | Remove um produto                           |
-| POST   | `/movimentar_produto`     | Registra uma movimentacao (somente ENTRADA) |
-| GET    | `/listar_movimentacoes`   | Lista as movimentacoes                      |
+| Metodo | Rota                              | Descricao                                   |
+| ------ | -------------------------         | ------------------------------------------- |
+| POST   | `/add_produto`                    | Cadastra um produto                         |
+| GET    | `/listar_produtos`                | Lista todos os produtos                     |
+| GET    | `/listar_produto/:id`             | Consulta um produto pelo id                 |
+| PUT    | `/atualizar_produto/:id`          | Atualiza um produto                         |
+| DELETE | `/deletar_produto`                | Remove um produto                           |
+| POST   | `/movimentar_produto_entrada`     | Registra uma movimentacao (somente ENTRADA) |
+| GET    | `/listar_movimentacoes`           | Lista as movimentacoes                      |
 
 ### POST /add_produto
 
