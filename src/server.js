@@ -6,6 +6,7 @@ const app = express();
 
 app.use(express.json());
 app.use(estoqueRoutes);
+app.use(cadastro);
 
 const porta = process.env.PORT || 3000;
 

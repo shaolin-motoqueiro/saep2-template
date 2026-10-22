@@ -1,0 +1,3 @@
+teste: movimentação de saída
+resultado esperado: "erro": "Estoque insuficiente."
+cenarioMovimentaçãoSaida.png

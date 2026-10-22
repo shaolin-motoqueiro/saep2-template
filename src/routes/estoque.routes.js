@@ -114,7 +114,7 @@ router.put('/atualizar_produto/:id', async (req, res) => {
 
 router.delete('/deletar_produto', async (req, res) => {
   const { id_produto } = req.body;
-
+  
   if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
     return res.status(422).json({ erro: 'O campo id_produto e obrigatorio' });
   }
@@ -149,7 +149,7 @@ router.delete('/deletar_produto', async (req, res) => {
 // MOVIMENTACOES
 // ---------------------------------------------------------------------------
 
-router.post('/movimentar_produto', async (req, res) => {
+router.post('/movimentar_produto_entrada', async (req, res) => {
   const { id_produto, tipo, quantidade } = req.body;
 
   if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
@@ -185,6 +185,53 @@ router.post('/movimentar_produto', async (req, res) => {
     return res.status(201).json({
       mensagem: 'Entrada registrada com sucesso',
       quantidade_atual: produtos[0].quantidade + Number(quantidade)
+    });
+  } catch (erro) {
+    console.log(erro);
+    return res.status(500).json({ erro: 'Erro ao movimentar produto' });
+  }
+});
+
+router.post('/movimentar_produto_saida', async (req, res) => {
+  const { id_produto, tipo, quantidade } = req.body;
+
+  if (id_produto === undefined || id_produto === null || isNaN(Number(id_produto))) {
+    return res.status(422).json({ erro: 'O campo id_produto e obrigatorio' });
+  }
+  if (tipo !== 'SAIDA') {
+    return res.status(422).json({ erro: 'Somente movimentacoes do tipo SAIDA são aceitas neste campo' });
+  }
+  if (quantidade === undefined || quantidade === null || isNaN(Number(quantidade)) || Number(quantidade) <= 0) {
+    return res.status(422).json({ erro: 'O campo quantidade deve ser um numero maior que zero' });
+  }
+
+  try {
+    const { rows: produtos } = await conexao.query(
+      'SELECT id_produto, quantidade FROM produto WHERE id_produto = $1',
+      [Number(id_produto)]
+    );
+
+    if (produtos.length === 0) {
+      return res.status(404).json({ erro: 'Produto nao encontrado' });
+    }
+
+    if (produtos[0].quantidade < Number(quantidade)){
+        return res.status(404).json({erro: "Estoque insuficiente."})
+    }
+
+    await conexao.query(
+      'INSERT INTO movimentacao (id_produto, tipo, quantidade) VALUES ($1, $2, $3)',
+      [Number(id_produto), tipo, Number(quantidade)]
+    );
+
+    await conexao.query(
+      'UPDATE produto SET quantidade = quantidade - $1 WHERE id_produto = $2',
+      [Number(quantidade), Number(id_produto)]
+    );
+
+    return res.status(201).json({
+      mensagem: 'Saida registrada com sucesso',
+      quantidade_atual: produtos[0].quantidade - Number(quantidade)
     });
   } catch (erro) {
     console.log(erro);
