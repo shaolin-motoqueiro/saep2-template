@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Funcionário</title>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <h1>Painel do Funcionário</h1>
+  <button onclick="sair()">Sair</button>
+
+  <h2>Produtos disponíveis</h2>
+  <button onclick="listar()">Atualizar</button>
+  <div id="produtos"></div>
+
+  <h2>Retirar produto</h2>
+  <input id="idProduto" type="number" min="1" step="1" placeholder="ID do produto">
+  <input id="qtdMov" type="number" min="1" step="1" placeholder="Quantidade">
+  <button onclick="movimentar()">Registrar saída</button>
+</body>
+</html>
