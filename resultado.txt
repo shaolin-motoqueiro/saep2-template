@@ -1,0 +1,3 @@
+Movimentação de saida
+Resultado esperado: 201
+cenarioMovimentacaoSaida.png
