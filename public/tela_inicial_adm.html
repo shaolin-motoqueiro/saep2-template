@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMINISTRADOR</title>
+</head>
+<body>
+    <header>
+        <br>
+        <a href="index.html"><button>VOLTAR PARA TELA INICIAL</button></a>
+        <h1>TELA DE LOGIN FUNCIONÁRIO</h1>
+    </header>
+
+
+<!-- ============================================  FUNCIONÁRIOS  ===================================================================== -->
+
+    <br>
+    <h2> CADASTRAR USUÁRIO - LOGIN</h2>
+    <input type="nome-novofuncionario" placeholder="Digite Nome Funcionário">
+    <input type="email-novofuncionario" placeholder="Digite E-mail Funcionário">
+    <input type="senha-novofuncionario" placeholder="Digite Senha Funcionário">
+    <button id="get-listar">POST</button>
+
+    <br>
+    <br>
+    <h2> ATUALIZAR USUÁRIO - LOGIN</h2>
+    <input type="nome-putfuncionario" placeholder="Digite Nome Funcionário">
+    <input type="email-putfuncionario" placeholder="Digite E-mail Funcionário">
+    <input type="senha-putfuncionario" placeholder="Digite Senha Funcionário">
+    <button id="get-listar">PUT</button>
+
+    <br>
+    <br>
+    <h2> DELETAR USUÁRIO - LOGIN</h2>
+    <input type="id-funcionario" placeholder="Digite o Id do Funcionário">
+    <button id="get-listar">DELETE  </button>
+
+<!-- ============================================  PRODUTOS ===================================================================== -->
+    <br>
+    <br>
+    <br>
+    <h2>LISTAR - GET</h2>
+    <button id="get-listar">LISTAR</button>
+    <br>
+    <br>
+
+    <h2>CADASTRAR PRODUTO - POST</h2>
+    <input id="nome-cadastrar" placeholder="Digite o Produto">
+    <input id="descricao-cadastrar" placeholder="Digite a Descrição">
+    <input id="valor-cadastrar" placeholder="Digite o Valor do Produto">
+    <input id="quantidade-cadastrar" placeholder="Digite a Quantidade">
+    <button id="post-listar">POST</button>
+
+    <br>
+    <br>
+
+    <h2>ATUALIZAR PRODUTO - PUT</h2>
+    <input type="id-cadastrar" placeholder="Digite o ID">
+    <input type="nome-cadastrar" placeholder="Digite o Produto">
+    <input type="descricao-cadastrar" placeholder="Digite a Descrição">
+    <input type="valor-cadastrar" placeholder="Digite o Valor do Produto">
+    <input type="quantidade-cadastrar" placeholder="Digite a Quantidade">
+    <button id="put-atualizar">PUT</button>
+
+    <h2>DELETAR PRODUTO - DELETE</h2>
+    <input type="id-cadastrar" placeholder="Digite o ID">
+    <button id="delete">DELETE</button>
+    
+
+    <div id="listar-admin"></div>
+    <script src="tela_incial_adm.js"></script>
+</body>
+</html>
