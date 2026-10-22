@@ -6,7 +6,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "nodemon --watch src/server.js"
   },
   "keywords": [
     "saep",
@@ -18,8 +18,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "nodemon": "^3.1.14",
     "pg": "^8.16.3"
   }
 }
