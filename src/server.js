@@ -6,6 +6,7 @@ import { autenticar } from './middlewares/auth.js';
 
 const app = express();
 app.use(express.json());
+app.use(express.static('src/public'));
 
 app.use(authRoutes);
 app.use(autenticar, estoqueRoutes);
