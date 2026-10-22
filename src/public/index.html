@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle de Estoque</title>
+</head>
+<body>
+  <h1>Controle de Estoque</h1>
+  <p id="msg"></p>
+
+  <section id="login">
+    <h2>Login / Cadastro</h2>
+    <input id="nome" placeholder="nome (só no cadastro)">
+    <input id="email" placeholder="email">
+    <input id="senha" type="password" placeholder="senha">
+    <select id="perfilNovo">
+      <option value="OPERADOR">OPERADOR</option>
+      <option value="ADMIN">ADMIN</option>
+    </select>
+    <button onclick="login()">Entrar</button>
+    <button onclick="cadastrar()">Cadastrar</button>
+  </section>
+
+  <section id="app" hidden>
+    <p>Perfil: <b id="perfil"></b> <button onclick="sair()">Sair</button></p>
+
+    <h2>Produtos</h2>
+    <input id="fNome" placeholder="filtrar por nome">
+    <input id="fData" type="date">
+    <button onclick="pagina = 1; listarProdutos()">Filtrar</button>
+    <table border="1">
+      <thead>
+        <tr><th>ID</th><th>Nome</th><th>Descrição</th><th>Valor</th><th>Qtd</th><th>Cadastro</th><th>Ações</th></tr>
+      </thead>
+      <tbody id="produtos"></tbody>
+    </table>
+    <button onclick="mudarPagina(-1)">Anterior</button>
+    <span id="pag"></span>
+    <button onclick="mudarPagina(1)">Próxima</button>
+
+    <h2>Cadastrar / Editar produto</h2>
+    <input type="hidden" id="pId">
+    <input id="pNome" placeholder="nome">
+    <input id="pDesc" placeholder="descrição">
+    <input id="pValor" type="number" step="0.01" placeholder="valor">
+    <input id="pQtd" type="number" placeholder="quantidade">
+    <button onclick="salvarProduto()">Salvar</button>
+    <button onclick="limparForm()">Limpar</button>
+
+    <h2>Movimentar estoque</h2>
+    <input id="mId" type="number" placeholder="id do produto">
+    <select id="mTipo">
+      <option value="ENTRADA">ENTRADA</option>
+      <option value="SAIDA">SAIDA</option>
+    </select>
+    <input id="mQtd" type="number" placeholder="quantidade">
+    <button onclick="movimentar()">Registrar</button>
+
+    <h2>Movimentações</h2>
+    <table border="1">
+      <thead>
+        <tr><th>ID</th><th>Produto</th><th>Tipo</th><th>Qtd</th><th>Data/hora</th><th>Usuário</th></tr>
+      </thead>
+      <tbody id="movimentacoes"></tbody>
+    </table>
+  </section>
+
+  <script>
+    let token = localStorage.getItem('token');
+    let perfil = localStorage.getItem('perfil');
+    let pagina = 1;
+    let totalPaginas = 1;
+    const limite = 5;
+
+    const $ = (id) => document.getElementById(id);
+    const msg = (texto) => { $('msg').textContent = texto || ''; };
+
+    async function api(url, metodo = 'GET', corpo) {
+      const res = await fetch(url, {
+        method: metodo,
+        headers: { 'Content-Type': 'application/json', ...(token && { Authorization: 'Bearer ' + token }) },
+        body: corpo ? JSON.stringify(corpo) : undefined
+      });
+      const dados = await res.json();
+      if (res.status === 401 && token) sair();
+      return { ok: res.ok, dados };
+    }
+
+    function botao(texto, fn) {
+      const b = document.createElement('button');
+      b.textContent = texto;
+      b.onclick = fn;
+      return b;
+    }
+
+    function linha(celulas) {
+      const tr = document.createElement('tr');
+      celulas.forEach((c) => {
+        const td = document.createElement('td');
+        if (c instanceof Node) td.append(c); else td.textContent = c ?? '';
+        tr.append(td);
+      });
+      return tr;
+    }
+
+    // ---------- autenticação ----------
+    async function cadastrar() {
+      const { dados } = await api('/cadastro', 'POST', {
+        nome: $('nome').value, email: $('email').value, senha: $('senha').value, perfil: $('perfilNovo').value
+      });
+      msg(dados.mensagem || dados.erro);
+    }
+
+    async function login() {
+      const { ok, dados } = await api('/login', 'POST', { email: $('email').value, senha: $('senha').value });
+      if (!ok) return msg(dados.erro);
+      token = dados.token;
+      perfil = dados.perfil;
+      localStorage.setItem('token', token);
+      localStorage.setItem('perfil', perfil);
+      msg('');
+      mostrar();
+    }
+
+    function sair() {
+      token = perfil = null;
+      localStorage.clear();
+      mostrar();
+    }
+
+    function mostrar() {
+      $('login').hidden = !!token;
+      $('app').hidden = !token;
+      if (token) {
+        $('perfil').textContent = perfil;
+        listarProdutos();
+        listarMovimentacoes();
+      }
+    }
+
+    // ---------- produtos ----------
+    async function listarProdutos() {
+      const q = new URLSearchParams({ page: pagina, limit: limite });
+      if ($('fNome').value) q.set('nome', $('fNome').value);
+      if ($('fData').value) q.set('data', $('fData').value);
+
+      const { ok, dados } = await api('/listar_produtos?' + q);
+      if (!ok) return msg(dados.erro);
+
+      totalPaginas = Math.max(Math.ceil(dados.total / limite), 1);
+      $('pag').textContent = `Página ${dados.pagina} de ${totalPaginas}`;
+      $('produtos').replaceChildren(...dados.produtos.map((p) => {
+        const acoes = document.createElement('span');
+        acoes.append(botao('Editar', () => editar(p)));
+        if (perfil === 'ADMIN') acoes.append(botao('Excluir', () => remover(p.id_produto)));
+        return linha([p.id_produto, p.nome, p.descricao, p.valor_unitario, p.quantidade,
+          new Date(p.data_cadastro).toLocaleString('pt-BR'), acoes]);
+      }));
+    }
+
+    function mudarPagina(d) {
+      pagina = Math.min(Math.max(pagina + d, 1), totalPaginas);
+      listarProdutos();
+    }
+
+    function editar(p) {
+      $('pId').value = p.id_produto;
+      $('pNome').value = p.nome;
+      $('pDesc').value = p.descricao || '';
+      $('pValor').value = p.valor_unitario;
+      $('pQtd').value = p.quantidade;
+    }
+
+    function limparForm() {
+      ['pId', 'pNome', 'pDesc', 'pValor', 'pQtd'].forEach((id) => { $(id).value = ''; });
+    }
+
+    async function salvarProduto() {
+      const corpo = { nome: $('pNome').value, descricao: $('pDesc').value, valor: $('pValor').value, quantidade: $('pQtd').value };
+      const id = $('pId').value;
+      const { dados } = id
+        ? await api('/atualizar_produto/' + id, 'PUT', corpo)
+        : await api('/add_produto', 'POST', corpo);
+      msg(dados.mensagem || dados.erro);
+      limparForm();
+      listarProdutos();
+    }
+
+    async function remover(id) {
+      if (!confirm('Excluir produto ' + id + '?')) return;
+      const { dados } = await api('/deletar_produto', 'DELETE', { id_produto: id });
+      msg(dados.mensagem || dados.erro);
+      listarProdutos();
+    }
+
+    // ---------- movimentações ----------
+    async function movimentar() {
+      const { dados } = await api('/movimentar_produto', 'POST', {
+        id_produto: $('mId').value, tipo: $('mTipo').value, quantidade: $('mQtd').value
+      });
+      msg(dados.mensagem ? `${dados.mensagem}. Saldo: ${dados.quantidade_atual}` : dados.erro);
+      listarProdutos();
+      listarMovimentacoes();
+    }
+
+    async function listarMovimentacoes() {
+      const { ok, dados } = await api('/listar_movimentacoes');
+      if (!ok) return msg(dados.erro);
+      $('movimentacoes').replaceChildren(...dados.map((m) => linha([
+        m.id_movimentacao, m.nome, m.tipo, m.quantidade,
+        new Date(m.data_hora).toLocaleString('pt-BR'), m.usuario
+      ])));
+    }
+
+    mostrar();
+  </script>
+</body>
+</html>
