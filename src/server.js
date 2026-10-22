@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import estoqueRoutes from './routes/estoque.routes.js';
+import estoqueRoutes from './controller/estoque.routes.js';
 
 const app = express();
 
