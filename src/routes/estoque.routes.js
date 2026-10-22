@@ -51,7 +51,7 @@ router.get('/listar_produtos', async (req, res) => {
 
 router.get('/listar_produto/:id', async (req, res) => {
   const { id } = req.params;
-
+ 
   if (isNaN(Number(id))) {
     return res.status(422).json({ erro: 'O id informado e invalido' });
   }
